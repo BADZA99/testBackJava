@@ -35,66 +35,89 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = new ArrayList<>();
-        transactions = transactionRepository.findAll();
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    public ResponseEntity<?> getAllTransactions() {
+        try {
+            List<Transaction> transactions = new ArrayList<>();
+            transactions = transactionRepository.findAll();
+            return new ResponseEntity<>(transactions, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to fetch transactions", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
-        Transaction newTransaction = transactionRepository.save(transaction);
-        return new ResponseEntity<>(newTransaction, HttpStatus.CREATED);
+    public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction) {
+        try {
+            Transaction newTransaction = transactionRepository.save(transaction);
+            return new ResponseEntity<>("Transaction created successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to create transaction", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransaction(@PathVariable("id") Long id) {
-        Transaction transaction = transactionRepository.findById(id).orElse(null);
-        if (transaction == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getTransaction(@PathVariable("id") Long id) {
+        try {
+            Transaction transaction = transactionRepository.findById(id).orElse(null);
+            if (transaction == null) {
+                return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(transaction, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to retrieve transaction", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(transaction, HttpStatus.OK);
     }
 
     // put
-   @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
-        Optional<Transaction> transactionData = transactionRepository.findById(id);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
+        try {
+            Optional<Transaction> transactionData = transactionRepository.findById(id);
 
-        if (transactionData.isPresent()) {
-            Transaction transactionToUpdate = transactionData.get();
-            transactionToUpdate.setDescription(transaction.getDescription());
-            transactionToUpdate.setType(transaction.getType());
-            transactionToUpdate.setAmount(transaction.getAmount());
+            if (transactionData.isPresent()) {
+                Transaction transactionToUpdate = transactionData.get();
+                transactionToUpdate.setDescription(transaction.getDescription());
+                transactionToUpdate.setType(transaction.getType());
+                transactionToUpdate.setAmount(transaction.getAmount());
 
-            // Format the date
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            String formattedDate = dateFormat.format(transaction.getDate());
-            try {
-                Date parsedDate = dateFormat.parse(formattedDate);
-                transactionToUpdate.setDate(parsedDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                // Format the date
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                String formattedDate = dateFormat.format(transaction.getDate());
+                try {
+                    Date parsedDate = dateFormat.parse(formattedDate);
+                    transactionToUpdate.setDate(parsedDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return new ResponseEntity<>("Invalid date format", HttpStatus.BAD_REQUEST);
+                }
+
+                transactionRepository.save(transactionToUpdate);
+                return new ResponseEntity<>(transactionToUpdate, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
             }
-
-            transactionRepository.save(transactionToUpdate);
-            return new ResponseEntity<>(transactionToUpdate, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update transaction", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // delete
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTransaction(@PathVariable("id") Long id) {
-        if (transactionRepository.existsById(id)) {
-            transactionRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> deleteTransaction(@PathVariable("id") Long id) {
+        try {
+            if (transactionRepository.existsById(id)) {
+                transactionRepository.deleteById(id);
+                return new ResponseEntity<>("Transaction deleted successfully", HttpStatus.NO_CONTENT);
+            } else {
+                return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete transaction", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     }
 
 
