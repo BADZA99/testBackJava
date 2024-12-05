@@ -16,12 +16,16 @@ public class Transaction {
     // id,description,amount,date
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private long id;
     @Column(name = "description")
     private String description;
+
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "amount")
     private double amount;
+
     @Column(name = "date")
     private Date date;
 
@@ -38,6 +42,9 @@ public class Transaction {
     public Date getDate() {
         return date;
     }
+    public String getType() {
+        return type;
+    }
     // setters  
     public void setDescription(String description) {
         this.description = description;
@@ -47,6 +54,9 @@ public class Transaction {
     }
     public void setDate(Date date) {
         this.date = date;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 }
 
