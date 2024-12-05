@@ -47,7 +47,7 @@ public class TransactionController {
 
 
 
-    @PostMapping
+    @PostMapping("/new")
     public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction) {
         try {
             Transaction newTransaction = transactionRepository.save(transaction);
@@ -71,7 +71,7 @@ public class TransactionController {
     }
 
     // put
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> updateTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
         try {
             Optional<Transaction> transactionData = transactionRepository.findById(id);
@@ -104,7 +104,7 @@ public class TransactionController {
     }
 
     // delete
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteTransaction(@PathVariable("id") Long id) {
         try {
             if (transactionRepository.existsById(id)) {
