@@ -13,6 +13,7 @@ import testback.com.testback.repositories.TransactionRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/transactions")
+@CrossOrigin(origins = "*")
 public class TransactionController {
     // @Autowired
     final TransactionRepository transactionRepository;
@@ -34,6 +36,7 @@ public class TransactionController {
         this.transactionRepository = transactionRepository;
     }
 
+   
     @GetMapping
     public ResponseEntity<?> getAllTransactions() {
         try {
@@ -47,7 +50,7 @@ public class TransactionController {
 
 
 
-    @PostMapping("/new")
+    @PostMapping
     public ResponseEntity<String> createTransaction(@RequestBody Transaction transaction) {
         try {
             Transaction newTransaction = transactionRepository.save(transaction);
@@ -71,7 +74,7 @@ public class TransactionController {
     }
 
     // put
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateTransaction(@PathVariable("id") long id, @RequestBody Transaction transaction) {
         try {
             Optional<Transaction> transactionData = transactionRepository.findById(id);
@@ -104,7 +107,7 @@ public class TransactionController {
     }
 
     // delete
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTransaction(@PathVariable("id") Long id) {
         try {
             if (transactionRepository.existsById(id)) {

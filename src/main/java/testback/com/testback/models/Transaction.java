@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "transaction")
 public class Transaction {
-    // id,description,amount,date
+   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
